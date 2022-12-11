@@ -1,4 +1,6 @@
+import math
 import numpy as np
+import os
 
 from multiprocessing import Manager
 from multiprocessing.pool import ThreadPool
@@ -11,17 +13,36 @@ from problems import SMAPProblem, listener
 
 
 def get_X(pop_size, n_var, config):
+    """
+    Create a square of size s*s = pop_size with starting positions for
+    each particle.
+    First axis (number of subclasses) is split into linear partitions
+    Second axis (window size) is split into exponential partitions
+    """
+    # a = xl
+    # b = (xu/xl)^(1/(pop_size - 1))
+    # for i in range(pop_size):
+    #   y = a * b^i
     X = np.empty((pop_size, n_var), dtype=np.float64)
-    r = (config["xu"][1] / config["xl"][1]) ** (1 / (pop_size - 1))
-    s0 = (config["xu"][0] - config["xl"][0]) / pop_size
-    for i in range(pop_size):
-        X[i, 0] = int(config["xl"][0] + i * s0)
-        X[i, 1] = int(r**i)
+    s = math.sqrt(pop_size)
+    assert s % 2 == 0
+    s = int(s)
+    a = config["xl"][1]
+    b = (config["xu"][1] / config["xl"][1]) ** (1 / (s - 1))
+    s0 = (config["xu"][0] - config["xl"][0]) / s
+    c = 0
+    for i in range(s):
+        x1 = round(a * b ** i)
+        for j in range(s):
+            x0 = int(config["xl"][0] + j * s0)
+            X[c, 0] = float(x0)
+            X[c, 1] = float(x1)
+            c += 1
     return X
 
 
 # Configuration of experiment
-pop_size = 20
+pop_size = 100
 n_threads = 5
 n_gens = 10
 n_var = 2
@@ -38,9 +59,11 @@ config = {
     "output": "p1_rgbi_smap",
     "validation": "validation",
     "xl": [2, 2],
-    "xu": [30, 4096],
+    "xu": [32, 4096],
     "n_var": n_var,
 }
+# Don't let i.gensigset to fight for CPU
+os.environ["OMP_THREAD_LIMIT"] = "2"
 
 # Prepare for a run
 pool = ThreadPool(n_threads)
