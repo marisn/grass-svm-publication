@@ -32,7 +32,7 @@ def get_X(pop_size, n_var, config):
     s0 = (config["xu"][0] - config["xl"][0]) / s
     c = 0
     for i in range(s):
-        x1 = round(a * b ** i)
+        x1 = round(a * b**i)
         for j in range(s):
             x0 = int(config["xl"][0] + j * s0)
             X[c, 0] = float(x0)
@@ -44,7 +44,7 @@ def get_X(pop_size, n_var, config):
 # Configuration of experiment
 pop_size = 100
 n_threads = 5
-n_gens = 10
+n_gens = 5
 n_var = 2
 _dir = "/home/marisn/Projekti/i.svm and r.smooth/"
 csv_file = _dir + "train_smap.csv"
@@ -84,4 +84,4 @@ pool.close()
 pool.join()
 
 with open(final_file, "w") as f:
-    f.write(f"X0:{res.X[0]:.6} X1:{res.X[1]:.6} F:{res.F:.6}\n")
+    f.write(f"X0:{res.X[0]:.6} X1:{res.X[1]:.6} F:{res.F[0]:.6}\n")

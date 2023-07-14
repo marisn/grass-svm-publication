@@ -71,4 +71,4 @@ pool.close()
 pool.join()
 
 with open(final_file, "w") as f:
-    f.write(f"X0:{res.X[0]:.6} X1:{res.X[1]:.6} F:{res.F:.6}\n")
+    f.write(f"X0:{res.X[0]:.6} X1:{res.X[1]:.6} F:{res.F[0]:.6}\n")
